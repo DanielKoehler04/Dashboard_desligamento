@@ -35,6 +35,11 @@ if arquivo is not None:
     tipos_ingresso = sorted(df["Tipo de ingresso"].str.lower().unique().tolist())
     tipos_ingresso_display = ["Todos"] + [t.title() for t in tipos_ingresso]
     ingresso_escolhido = st.sidebar.selectbox("Tipo de ingresso:", tipos_ingresso_display)
+    
+    df["Supervisor"] = df["Supervisor"].astype(str)
+    supervisor = sorted(df["Supervisor"].str.lower().unique().tolist())
+    supervisor_display = ["Todos"] + [t.title() for t in supervisor]
+    supervisor_escolhido = st.sidebar.selectbox("Supervisor:", supervisor_display)
 
     # --- Aplicando filtros ---
     df_filt = df.copy()
@@ -42,6 +47,9 @@ if arquivo is not None:
     # Filtro por tipo de ingresso
     if ingresso_escolhido != "Todos":
         df_filt = df_filt[df_filt["Tipo de ingresso"].str.lower() == ingresso_escolhido.lower()]
+
+    if supervisor_escolhido != "Todos":
+        df_filt = df_filt[df_filt["Supervisor"].str.lower() == supervisor_escolhido.lower()]
 
     # Filtro por mês/ano
     if mes_escolhido != "Todos":
