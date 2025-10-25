@@ -95,6 +95,17 @@ if arquivo is not None:
 
 
     graficos = [
+        "2) Como você descreveria sua experiência geral trabalhando aqui?",
+        "5) Como você avalia o clima organizacional da empresa?",
+        "6) Você sofreu algum tipo de discriminação ou assédio na empresa?",
+        "8)  Como foi sua experiência com a comunicação interna na empresa?",
+        "9) Você se sentiu apoiado e valorizado pela liderança?",
+        "11) Você sentiu que teve oportunidades suficientes para crescimento e desenvolvimento profissional aqui?",
+        "12) Como você avalia os programas de treinamento e desenvolvimento oferecidos pela empresa?",
+        "13) Você estava satisfeito com sua remuneração e os benefícios oferecidos pela empresa?"
+    ]
+
+    titulos = [
         "Descricao Experiencia",
         "Clima Organizacional",
         "Discriminação e Assédio",
@@ -109,20 +120,20 @@ if arquivo is not None:
     cols = [st.columns(2) for _ in range(4)]
     colunas = [c for dupla in cols for c in dupla]
 
-    def gera_grafico(coluna, col):
+    def gera_grafico(coluna, col, titulo):
         if coluna not in df_filt.columns:
             return
         cont = df_filt[coluna].dropna().value_counts().reset_index()
         if cont.empty:
             return
         cont.columns = [coluna, "Quantidade"]
-        fig = px.pie(cont, values="Quantidade", names=coluna, title=coluna)
+        fig = px.pie(cont, values="Quantidade", names=coluna, title=titulo)
         fig.update_traces(textinfo="percent+value", textfont_size=13)
         col.plotly_chart(fig, use_container_width=True)
 
     # Gera todos os gráficos
     for i, nome in enumerate(graficos):
-        gera_grafico(nome, colunas[i])
+        gera_grafico(nome, colunas[i], titulos[i])
 
 else:
     st.info("Envie um arquivo Excel (.xlsx) na barra lateral para iniciar a análise.")
