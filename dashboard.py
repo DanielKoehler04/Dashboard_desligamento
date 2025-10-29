@@ -18,12 +18,17 @@ if arquivo is not None:
         df["Data"] = df["Data da Demissão - Tipo de Demissão"].str.split(" - ").str[0]
         df["Data"] = pd.to_datetime(df["Data"], errors="coerce",  dayfirst=True)
         df["Mes_Ano"] = df["Data"].dt.strftime("%m/%Y")
+        df["Ano"] = df["Data"].dt.strftime("%Y")
     else:
         st.error("A coluna 'Data da Demissão - Tipo de Demissão' não foi encontrada na planilha.")
         st.stop()
 
     # --- Filtros laterais ---
     st.sidebar.header("Filtros")
+
+    anos = sorted(df["Ano"].dropna().unique().tolist())
+    anos.insert(0, "Todos")
+    ano_escolhido = st.sidebar.selectbox("Ano:", anos)
 
     # Filtro de mês e ano
     meses = sorted(df["Mes_Ano"].dropna().unique().tolist(), key=lambda x: pd.to_datetime("01/" + x, dayfirst=True))
@@ -54,6 +59,9 @@ if arquivo is not None:
     # Filtro por mês/ano
     if mes_escolhido != "Todos":
         df_filt = df_filt[df_filt["Mes_Ano"] == mes_escolhido]
+
+    if ano_escolhido != "Todos":
+        df_filt = df_filt[df_filt["Ano"] == ano_escolhido]
 
     
     if "Data da Demissão - Tipo de Demissão" in df_filt.columns:
@@ -110,30 +118,36 @@ if arquivo is not None:
         "Clima Organizacional",
         "Discriminação e Assédio",
         "Experiência Comunicação Interna",
+        "Apoio e Valorizacao Pela Lideranca",
         "Oportunidade Para Crescimento",
         "Avaliação Programa de Treinamento",
-        "Apoio e Valorizacao Pela Lideranca",
         "Remuneração e Benefícios"
     ]
+
+    ordens = [["Muito positiva", "Positiva", "Neutra", "Muito negativa", "Negativa"], ["Excelente", "Bom", "Satisfatório","Insatisfatório", "Ruim"], 
+              ["Sim", "Não"], ["Excelente", "Boa", "Satisfatória", "Insatisfatória", "Ruim"],["Sempre", "Frequentemente", "Às vezes", "Raramente", "Nunca"],
+              ["Sempre", "Frequentemente", "Às vezes", "Raramente", "Nunca"], ["Excelente", "Bom", "Satisfatório","Insatisfatório", "Ruim"],
+              ["Muito Satisfeito", "Satisfeito", "Neutro", "Insatisfeito", "Muito insatisfeito"]
+            ]
 
     # Criação das colunas (4 linhas x 2 colunas)
     cols = [st.columns(2) for _ in range(4)]
     colunas = [c for dupla in cols for c in dupla]
 
-    def gera_grafico(coluna, col, titulo):
+    def gera_grafico(coluna, col, titulo, ordem):
         if coluna not in df_filt.columns:
             return
         cont = df_filt[coluna].dropna().value_counts().reset_index()
         if cont.empty:
             return
         cont.columns = [coluna, "Quantidade"]
-        fig = px.pie(cont, values="Quantidade", names=coluna, title=titulo)
-        fig.update_traces(textinfo="percent+value", textfont_size=13)
+        fig = px.pie(cont, values="Quantidade", names=coluna, title=titulo, category_orders={coluna: ordem})
+        fig.update_traces(textinfo="percent+value", textfont_size=15, sort=False)
         col.plotly_chart(fig, use_container_width=True)
 
     # Gera todos os gráficos
     for i, nome in enumerate(graficos):
-        gera_grafico(nome, colunas[i], titulos[i])
+        gera_grafico(nome, colunas[i], titulos[i], ordens[i])
 
 else:
     st.info("Envie um arquivo Excel (.xlsx) na barra lateral para iniciar a análise.")
