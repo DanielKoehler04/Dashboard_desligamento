@@ -251,7 +251,7 @@ if url is not None:
         fig = px.pie(cont, values="Quantidade", names=coluna, title=titulo, category_orders={coluna: ordem})
         fig.update_traces(textinfo="percent+value", textfont_size=22, sort=False)
         fig.update_layout(
-            title_font_size=25,
+            title_font_size=20,
               legend=dict(
                 font=dict(
                     size=18  # tamanho da legenda
